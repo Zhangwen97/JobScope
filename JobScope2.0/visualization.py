@@ -37,22 +37,81 @@ def fortuneHundred():
     else:
         startFunctions()
 
-#show one company's information  (percentages & wordcloud)
+
+# user can enter a part of the company's name, the search is case-insensitive
 def fortuneOne():
-    compID=input("Please enter the rankID of the company which you are interested in: ")
-    print("This is how employees feel about their company:\n")
-    compInfo=pd.DataFrame(fortune_df.iloc[[int(compID)-1],[0,1,3,4,5,6,7,8]].values.T)[0]
-    for i in compInfo:
-        print(i)
-    words=eval(fortune_df.iloc[[int(compID)-1],[2]].values[0][0])
-    cloud_fortune = WordCloud().generate_from_frequencies(words)
-    plt.imshow(cloud_fortune, interpolation='bilinear')
-    plt.title("Why employees say this is a great place to work")
-    plt.axis("off")
-    plt.show()
-    back=input("\nIf you want to go back to Home Page, please enter 0: ")
-    if(back=="0"):
-        startFunctions()
+    compName=input("Please enter the company's name which you are interested in: ").lower()
+    count=0
+    for k in range(0,100):
+        if fortune_df.iloc[[k],[1]].values[0][0].lower().find(compName)!=-1:
+            count+=1
+            print ("This is how employees feel about their company:\n")
+            compInfo = pd.DataFrame (fortune_df.iloc[[k], [0, 1, 3, 4, 5, 6, 7, 8]].values.T)[0]
+            for i in compInfo:
+                print (i)
+            words = eval (fortune_df.iloc[[k], [2]].values[0][0])
+            cloud_fortune = WordCloud ().generate_from_frequencies (words)
+            plt.imshow (cloud_fortune, interpolation='bilinear')
+            plt.title ("Why employees say this is a great place to work")
+            plt.axis ("off")
+            plt.show ()
+    if count==0:
+        print("We are so sorry, but the company that you are searching for is not in our system")
+    back = input ("\nIf you want us to search that company online for you, please enter 1.\n"
+                  "If you want to go back to Home Page, please enter 0: ")
+    if (back == "0"):
+        startFunctions ()
+    elif back=="1":
+        searchOnline()
+
+#if the company is not in 100 FORTUNE Best List, search online information
+'''Zhetian, Rahul, John'''
+def searchOnline():
+    return 0;
+
+
+# # get link through selenium
+# def getHTML(company, chromedriver_executable):
+#     browser = webdriver.Chrome (executable_path=chromedriver_executable)
+#     browser.get ("https://www.comparably.com")
+#     search_bar = browser.find_element_by_xpath (
+#         '/html/body/div/div/div[1]/div/div/div/div[1]/div/div/form/div/div/input')
+#     search_bar.send_keys (company)
+#     search_bar.send_keys (Keys.RETURN)
+#     time.sleep (3)
+#     browser.find_element_by_xpath ('/html/body/div/div/div/div/div[2]/div[1]/div/div[2]/a[1]/div/div/div[1]').click ()
+#     return_this = (browser.current_url)
+#     browser.close ()
+#     return return_this
+#
+#
+# # Getting reviews into a list
+# def getReviews(html):
+#     reviews = []
+#     while html != '':
+#         req = Request (html, headers={'User-Agent': 'Mozilla/5.0'})
+#         comparably = BeautifulSoup (urlopen (req).read (), "lxml")
+#         temp_reviews = comparably.find_all ('p', {"class": "cppRH-review-quote"})
+#         for tag in temp_reviews:
+#             if tag.find ('a') is None:
+#                 reviews += tag.contents
+#             else:
+#                 reviews += tag.find ('a').contents
+#         html = comparably.find_all ('a', {"class": "page"})[-1]['href']
+#     return reviews
+#
+#     # Getting culture and ceo score
+#     req = Request (html, headers={'User-Agent': 'Mozilla/5.0'})
+#
+#
+# overview = BeautifulSoup (urlopen (req).read (), "lxml")
+# try:
+#     cultureDict[company] = overview.find ('div', {"class": "letterGrade"}).contents
+#     ceoDict[company] = overview.find ('span', {"class": "grade-text"}).contents
+# except:
+#     cultureDict[company] = ['NA']
+#     ceoDict[company] = ['-1']
+
 
 #show the overall information of all the companies in
 def fortuneWhole():
