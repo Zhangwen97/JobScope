@@ -1,4 +1,6 @@
-
+# Inputs - chromedriver_executable, fortune100.csv, company_urls_modified.csv
+# Outputs - reviews_word_freq.csv, comparably_scores_all.csv, comparably_company_reviews_sample.csv, company_urls.csv
+# Author - Rahul Bhaskaruni
 
 from urllib.request import Request, urlopen
 from selenium import webdriver
@@ -8,10 +10,9 @@ import re
 from bs4 import BeautifulSoup
 import pandas as pd
 from wordcloud import STOPWORDS 
-import os
 
-chromedriver_executable = "C:\\Users\\Rahul\\Desktop\\CMU_study\\Python\\project\\webDriver\\chromedriver.exe"
-os.chdir("C:\\Users\\Rahul\\Desktop\\CMU_study\\Python\\project")
+
+chromedriver_executable = "chromedriver"
 
 # get link through selenium 
 def getHTML(company,chromedriver_executable):
@@ -95,18 +96,17 @@ def getComparablyInfoSingleCompany(company,chromedriver_executable):
 
 
 
-getComparablyInfoSingleCompany('google',chromedriver_executable)
+#getComparablyInfoSingleCompany('google',chromedriver_executable)
 
 #**************** Scrape for 100 companies ********************
 
 ## gets all URLs for the fortune 100 companies
 # Uses hard-coded values - need to change
-companyList = pd.read_csv("./Data/fortune100.csv")
+companyList = pd.read_csv("./fortune100.csv")
 companyURLDict = dict()
 for company in companyList['company'].values:
     print("Scraping for: " + company)
     companyURLDict[company] = getHTML(company,chromedriver_executable)
-#     reviewDict[company] = (getReviews(companyURLDict[company]+"/reviews"))
 pd.DataFrame(list(companyURLDict.items()),columns=['company','url']).to_csv("company_urls.csv")
 
 
@@ -115,6 +115,7 @@ companyListModified = pd.read_csv('./company_urls_modified.csv')
 reviewDict = dict()
 for i in range(companyListModified.shape[0]):
     company = companyListModified['company'][i]
+    print("Getting reviews for: " + company)
     companyLink = companyListModified['url'][i]
     try:
         print("link used: "+companyLink+"/reviews")
@@ -170,7 +171,7 @@ for company in reviewDict.keys():
     if('no reviews found or something went wrong' in reviewDict[company]):
         continue
     else:
-#         print(company)
+        print("treating reviews of:" + company)
         all_reviews = ' '.join(reviewDict[company])
         # removing punctuation, trimming white spaces and lower case
         all_reviews = re.sub(r'\s+',' ',re.sub("[^A-Za-z0-9' ]",' ',all_reviews).strip()).lower()
